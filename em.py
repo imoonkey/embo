@@ -50,6 +50,7 @@ def em(hmm, obs_all):
         xi_sum += xi.sum(axis=2)
         for z in range(hmm.num_obs):
             obs_sum[z,:] += gamma[:,obs == z].sum(axis=1)
+        print(gamma_sum)
     # finally compute estimates
     est_z_mat = obs_sum / obs_sum.sum(axis=0)[np.newaxis,:]
     est_t_mat = xi_sum / xi_sum.sum(axis=0)[np.newaxis,:]
@@ -80,6 +81,10 @@ def test():
     est_z_mat, est_t_mat = em(hmm1, np.vstack((obs1, obs2, obs3)))
     print(est_z_mat)
     print(est_t_mat)
+    
+    hmm_est = HMM(est_z_mat, est_t_mat, pi_vec)
+    print(hmm_est.loglikelihood(obs3))
+    print(hmm1.loglikelihood(obs3))
     
 if __name__ == '__main__':
     test()
