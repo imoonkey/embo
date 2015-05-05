@@ -105,11 +105,11 @@ def test():
     hmm3 = HMM(np.array([[0.8, 0.2],[0.1, 0.9]]), np.array([[0.9, 0.1],[0.1, 0.9]]), pi_vec)
     
     np.random.seed(0x6b6c26b2)
-    obs1 = hmm1.generate(1000)
+    obs1 = hmm1.generate(100)
 #    print(obs1)
 #    print(obs2)
     
-    ll_log, iters_log = em_restarts(hmm1, obs1[np.newaxis,:], 10, 50, 0.1)
+    ll_log, iters_log = em_restarts(hmm1, obs1[np.newaxis,:], 50, 50, 0.1)
     print('ll_log: ' + str(ll_log))
     print('max: ' + str(np.max(ll_log)))
     print('iters_log: ' + str(iters_log))

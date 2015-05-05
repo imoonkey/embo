@@ -107,6 +107,18 @@ def make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec):
     
     return HMM(z_mat, t_mat, pi_vec)
 
+def retrieve_parameterized_HMM(hmm):
+    # returns a parameterized version of the given hmm
+    z_mat = np.log(hmm.z_mat)
+    z_mat -= z_mat[-1,:][np.newaxis,:]
+    z_mat = z_mat[:-1,:]
+    
+    t_mat = np.log(hmm.z_mat)
+    t_mat -= t_mat[-1,:][np.newaxis,:]
+    t_mat = t_mat[:-1,:]
+    
+    return z_mat, t_mat
+
 def test():
     t_mat = np.array([[0.9, 0.1],[0.1, 0.9]])
     z_mat = np.array([[0.9, 0.1],[0.1, 0.9]])
@@ -118,11 +130,15 @@ def test():
     hmm1 = HMM(z_mat, t_mat, pi_vec)
     hmm2 = make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec)
     hmm3 = HMM(np.array([[0.8, 0.2],[0.1, 0.9]]), np.array([[0.9, 0.1],[0.1, 0.9]]), pi_vec)
+    conv_z_mat, conv_t_mat = retrieve_parameterized_HMM(hmm1)
+    hmm4 = make_parameterized_HMM(conv_z_mat, conv_t_mat, pi_vec)
     
     print(hmm1.z_mat)
     print(hmm1.t_mat)
     print(hmm2.z_mat)
     print(hmm2.t_mat)
+    print(hmm4.z_mat)
+    print(hmm4.t_mat)
     
     np.random.seed(0x6b6c26b2)
     obs1 = hmm1.generate(100)
