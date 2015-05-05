@@ -2,36 +2,40 @@ import numpy as np
 import numpy.matlib as npmat
 from hmm import *
 
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
 def em_restarts(hmm, obs_all, restarts, iters, epsilon):
     iters_log = np.zeros((restarts,))
-    ll_log = np.zeros((restarts,))
+    ll_log = np.zeros((restarts,iters+1))
     for i in range(restarts):
         z_mat_init, t_mat_init = random_hmm(hmm.num_states, hmm.num_obs)
-        hmm_est, actual_iters = em(hmm, z_mat_init, t_mat_init, obs_all, iters, epsilon)
+        hmm_est, curr_ll_log, actual_iters = em(hmm, z_mat_init, t_mat_init, obs_all, iters, epsilon)
         iters_log[i] = actual_iters
-        ll_log[i] = hmm_est.loglikelihood(obs_all[0])
+        ll_log[i] = curr_ll_log
     return ll_log, iters_log
 
 def em(hmm, z_mat_init, t_mat_init, obs_all, iters, epsilon):
     prev_z_mat = z_mat_init
     prev_t_mat = t_mat_init
     hmm_est = HMM(prev_z_mat, prev_t_mat, hmm.pi_vec)
-    prev_ll = hmm_est.loglikelihood(obs_all[0])
+    ll_log = np.zeros((iters+1,))
+    ll_log[0] = hmm_est.loglikelihood(obs_all[0])
     actual_iters = iters
     for i in range(iters):
         next_z_mat, next_t_mat = em_step(hmm.num_states, hmm.num_obs, hmm.pi_vec, prev_z_mat, prev_t_mat, obs_all)
         hmm_est = HMM(next_z_mat, next_t_mat, hmm.pi_vec)
-        next_ll = hmm_est.loglikelihood(obs_all[0])
+        ll_log[i+1] = hmm_est.loglikelihood(obs_all[0])
         if False:
             print('EM estimates')
             print(hmm_est.z_mat)
             print(hmm_est.t_mat)
             print(next_ll)
-        if (next_ll - prev_ll) <= epsilon:
+        if (ll_log[i+1] - ll_log[i]) <= epsilon:
             actual_iters = i+1
             break
-        prev_z_mat, prev_t_mat, prev_ll = next_z_mat, next_t_mat, next_ll
-    return hmm_est, actual_iters
+        prev_z_mat, prev_t_mat = next_z_mat, next_t_mat
+    return hmm_est, ll_log, actual_iters
 
 def em_step(num_states, num_obs, pi_vec, z_mat, t_mat, obs_all):
     # given initial parameters, run em from the obs
@@ -115,7 +119,53 @@ def test():
     print('iters_log: ' + str(iters_log))
     print('real param ll: ' + str(hmm1.loglikelihood(obs1)))
         
+
+def run_test():
+    # basic params
+    num_runs = 10
+    num_em_restarts = 50
+    em_thres = 0.1
+    em_iters = 20
+    obs_length = 100
+    num_states = 2
+    num_obs = 2
     
+    # use consistent seeds
+    np.random.seed(0x6b6c26b2)
+    seeds = np.random.randint(0x0fffffff, size=num_runs)
+    
+    em_ll_maxes = np.zeros((num_runs, num_em_restarts))
+    actual_ll = np.zeros((num_runs,))
+    
+    for t in range(num_runs):
+        np.random.seed(seeds[t])
+        # random hmm
+        z_mat, t_mat = random_hmm(num_states, num_obs)
+        pi_vec = np.array([1.0 / num_states] * num_states)
+        hmm_test = HMM(z_mat, t_mat, pi_vec)
+        # random obs trajectory
+        obs = hmm_test.generate(obs_length)[np.newaxis,:]
+        # em
+        ll_log, iters_log = em_restarts(hmm_test, obs, num_em_restarts, em_iters, em_thres)
+        iters_log = iters_log.astype(np.int)
+        # results
+        actual_ll[t] = hmm_test.loglikelihood(obs[0])
+        # compute the accumulated min over the restarts
+        final_ll = ll_log[np.arange(0,num_em_restarts), iters_log]
+        curr_max = final_ll[0]
+        for i in range(num_em_restarts):
+            curr_max = np.max([curr_max, final_ll[i]])
+            em_ll_maxes[t,i] = curr_max
+    
+    # compute some stuff
+    ll_ratios = em_ll_maxes - actual_ll[:, np.newaxis]
+    print(actual_ll)
+    print(em_ll_maxes)
+    print(ll_ratios)
+    mean_ll_ratios = np.mean(ll_ratios, axis=0)
+    print(mean_ll_ratios)
+    plt.plot(mean_ll_ratios)
+
 if __name__ == '__main__':
-    test()
+    run_test()
     pass

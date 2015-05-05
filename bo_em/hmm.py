@@ -141,7 +141,7 @@ def test():
     print(hmm4.t_mat)
     
     np.random.seed(0x6b6c26b2)
-    obs1 = hmm1.generate(100)
+    obs1 = hmm1.generate(2)
     print(obs1)
 #    np.random.seed(0x6b6c26b2)
 #    obs2 = hmm2.generate(1000)
