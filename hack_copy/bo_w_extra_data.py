@@ -250,9 +250,6 @@ def get_options():
 
     return options, expt_dir
 
-def import_extra_points(expt_dir):
-    pass
-
 # TODO:: first find the spot to add the jobs into the db.
 # TODO:: second find what to do with the hypers.
 

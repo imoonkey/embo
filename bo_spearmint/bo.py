@@ -8,12 +8,12 @@ sys.path.insert(0, parentdir)
 
 import hmm
 import numpy as np
-
+import json
 
 # Write a function like this called 'main'
 def main(job_id, params):
     # print 'Anything printed here will end up in the output directory for job #%d' % job_id
-    print params
+    print 'Params:' + str(params)
 
     # generate HMM observations
     z_mat_p = np.array([[np.log(9), np.log(1.0 / 9)]])
@@ -25,7 +25,6 @@ def main(job_id, params):
 
     # calculate log likelihood for input HMM parameters
     z_mat_p_input = np.array([[params['z_mat_p_0'][0], params['z_mat_p_1'][0]]])
-    print z_mat_p_input
     t_mat_p_input = np.array([[params['t_mat_p_0'][0], params['t_mat_p_1'][0]]])
     # pi_vec_input = np.array([params['pi_0'], 1 - params['pi_0']])
     hmm_estimate = hmm.make_parameterized_HMM(z_mat_p_input, t_mat_p_input, pi_vec)
