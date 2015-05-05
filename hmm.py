@@ -62,6 +62,8 @@ def sample_discrete(pvals):
 
 def make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec):
     num_states = t_mat_p.shape[1]
+    print z_mat_p.shape
+    print num_states
     z_mat = np.exp(np.vstack((z_mat_p, np.zeros((num_states,)))))
     t_mat = np.exp(np.vstack((t_mat_p, np.zeros((num_states,)))))
     

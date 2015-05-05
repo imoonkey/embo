@@ -1,0 +1,32 @@
+{
+    "language": "PYTHON",
+    "main-file": "bo.py",
+    "experiment-name": "simplebo-hmm",
+    "likelihood": "NOISELESS",
+    "variables": {
+        "z_mat_p_0": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": -50,
+            "max": 50
+        },
+        "z_mat_p_1": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": -50,
+            "max": 50
+        },
+        "t_mat_p_0": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": -50,
+            "max": 50
+        },
+        "t_mat_p_1": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": -50,
+            "max": 50
+        }
+    }
+}
