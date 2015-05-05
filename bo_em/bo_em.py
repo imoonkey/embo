@@ -92,7 +92,7 @@ def main(job_id, params):
     pi_vec = np.array([0.5, 0.5])
     hmm_groundtruth = hmm.make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec)
     np.random.seed(0x6b6c26b2)
-    obs = hmm_groundtruth.generate(20)
+    obs = hmm_groundtruth.generate(100)
 
     # calculate log likelihood for input HMM parameters
     z_mat_p_input = np.array([[params['z_mat_p_0'][0], params['z_mat_p_1'][0]]])
@@ -104,25 +104,28 @@ def main(job_id, params):
     # use the current suggest point and run EM to get a new point
     hmm_em_est, actual_iters = em.em(hmm_estimate, hmm_estimate.z_mat, hmm_estimate.t_mat, obs[np.newaxis,:], 30, 0.1)
     em_est_z_mat, em_est_t_mat = hmm.retrieve_parameterized_HMM(hmm_em_est)
-    
+    em_est_ll = -hmm_em_est.loglikelihood(obs)
     em_est_z_mat.reshape((em_est_z_mat.size,))
     em_est_t_mat.reshape((em_est_t_mat.size,))
-    historical_points = [{'params' : None}]
+    print em_est_t_mat
+    print em_est_z_mat
+    historical_points = [{'params' : {}}]
     # write z_mat
-    for i,v in enumerate(em_est_z_mat):
-        historical_points[0]['params']['z_mat_p_' + str(i)] = v
+    for i,v in enumerate(em_est_z_mat[0]):
+        historical_points[0]['params']['z_mat_p_' + str(i)] = {'values': np.array([v]), 'type': 'float'}
     # write t_mat
-    for i,v in enumerate(em_est_t_mat):
-        historical_points[0]['params']['t_mat_p_' + str(i)] = v
+    for i,v in enumerate(em_est_t_mat[0]):
+        historical_points[0]['params']['t_mat_p_' + str(i)] = {'values': np.array([v]), 'type': 'float'}
+    historical_points[0]['value'] = em_est_ll
     dump_new_history('.', historical_points)
     return -hmm_loglikelihood
 
 
 if __name__ == '__main__':
     parameters = {
-        'z_mat_p_0': 9,
-        'z_mat_p_1': 1.0/9,
-        't_mat_p_0': 9,
-        't_mat_p_1': 1.0/9,
+        'z_mat_p_0': [9],
+        'z_mat_p_1': [1.0/9],
+        't_mat_p_0': [9],
+        't_mat_p_1': [1.0/9],
     }
     print main(1,parameters)

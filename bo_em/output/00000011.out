@@ -1,0 +1,15 @@
+Job launching after 0.17 seconds in submission.
+Running python job.
+Changed into dir /Users/moonkey/Dropbox/Course/Optimization/Project/embo/bo_em
+Importing bo_em.py
+Running bo_em.main()
+Got result 282.608475704
+Completed successfully in 0.17 seconds. [{u'main': 282.60847570445446}]
+Params:{u't_mat_p_0': array([-6.]), u't_mat_p_1': array([-6.]), u'z_mat_p_0': array([-4.77432237]), u'z_mat_p_1': array([ 6.])}
+(1, 2)
+2
+(1, 2)
+2
+[[-13.45034153   1.41736562]]
+[[-13.45034153   1.41736562]]
+New history dumped.
