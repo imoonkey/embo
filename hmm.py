@@ -37,16 +37,37 @@ class HMM:
     def loglikelihood(self, obs):
         # compute the log likelihood given a sequence of obs
         t_mat = npmat.matrix(self.t_mat)
+        # use alpha
         alpha = npmat.matrix((self.pi_vec * self.z_mat[obs[0], :])[:,np.newaxis])
-        asum = alpha.sum()
-        alpha /= asum
-        log_coef = np.log(asum)
+#        print('self.z_mat[obs[0], :]: '+ str(self.z_mat[obs[0], :]))
+#        print('self.pi_vec: '+ str(self.pi_vec))
+#        print('self.pi_vec * self.z_mat[obs[0], :]: '+ str(self.pi_vec * self.z_mat[obs[0], :]))
+#        print('alpha: '+ str(alpha))
+        log_coef = 0
         for i in range(1,len(obs)):
-            alpha = npmat.matrix(((t_mat * alpha).getA()[0] * self.z_mat[obs[i], :])[:,np.newaxis])
+            alpha = npmat.matrix(((t_mat * alpha).getA()[:,0] * self.z_mat[obs[i], :])[:,np.newaxis])
             asum = alpha.sum()
             alpha /= asum
             log_coef += np.log(asum)
-        return log_coef + np.log(alpha.sum())
+        alpha_ll = log_coef + np.log(alpha.sum())
+        # use beta
+        if False:
+            beta = npmat.ones((t_mat.shape[0], 1))
+            log_coef = 0
+            for i in range(len(obs)-2,-1,-1):
+    #            print('self.z_mat[obs[i+1], :]: ' + str(self.z_mat[obs[i+1], :]))
+    #            print('beta.getA()[0]: ' + str(beta.getA()[:,0]))
+    #            print('self.z_mat[obs[i+1], :] * beta.getA()[:,0]: ' + str(self.z_mat[obs[i+1], :] * beta.getA()[:,0]))
+    #            print('npmat.matrix(result): ' + str(npmat.matrix((self.z_mat[obs[i+1], :] * beta.getA()[:,0])[:,np.newaxis])))
+    #            print('t_mat.getT(): ' + str(t_mat.getT()))
+                beta = t_mat.getT() * npmat.matrix((self.z_mat[obs[i+1], :] * beta.getA()[:,0])[:,np.newaxis])
+                bsum = beta.sum()
+                beta /= bsum
+                log_coef += np.log(bsum)
+            beta_ll = log_coef + np.log(np.sum(beta.getA()[0] * self.pi_vec * self.z_mat[obs[0],:]))
+    #        print('alpha_ll: ' + str(alpha_ll))
+    #        print('beta_ll: ' + str(beta_ll))
+        return alpha_ll
         
 
 def sample_discrete(pvals):
@@ -59,6 +80,20 @@ def sample_discrete(pvals):
             return i
     else:
         return len(pvals)-1
+
+def random_hmm(num_states, num_obs):
+    # returns a random transition and observation matrix
+    z_mat = np.random.rand(num_obs, num_states)
+    z_mat += 0.0000001
+    z_mat = -np.log(z_mat)
+    z_mat /= z_mat.sum(axis=0)[np.newaxis,:]
+    
+    t_mat = np.random.rand(num_states, num_states)
+    t_mat += 0.0000001
+    t_mat = -np.log(t_mat)
+    t_mat /= t_mat.sum(axis=0)[np.newaxis,:]
+    
+    return z_mat, t_mat
 
 def make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec):
     num_states = t_mat_p.shape[1]
@@ -90,11 +125,11 @@ def test():
     print(hmm2.t_mat)
     
     np.random.seed(0x6b6c26b2)
-    obs1 = hmm1.generate(20)
+    obs1 = hmm1.generate(100)
     print(obs1)
-    np.random.seed(0x6b6c26b2)
-    obs2 = hmm2.generate(20)
-    print(obs2)
+#    np.random.seed(0x6b6c26b2)
+#    obs2 = hmm2.generate(1000)
+#    print(obs2)
 
     print(hmm1.loglikelihood(obs1))
     print(hmm2.loglikelihood(obs1))
