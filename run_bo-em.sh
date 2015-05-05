@@ -8,6 +8,6 @@
 cd ~/Dropbox/Course/Optimization/Project/embo/
 mongo mongo_clean.js
 
-rm bo_spearmint/output/*
-rmdir bo_spearmint/output/
-python ../Spearmint/spearmint/bo_w_extra_data.py bo_spearmint/
+rm bo_em/output/*
+rmdir bo_em/output/
+python ../Spearmint/spearmint/bo_w_extra_data.py bo_em/
