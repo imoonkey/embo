@@ -1,7 +1,7 @@
 {
     "language": "PYTHON",
     "main-file": "bo.py",
-    "experiment-name": "simplebo-hmm",
+    "experiment-name": "simple-bo-hmm",
     "likelihood": "NOISELESS",
     "variables": {
         "z_mat_p_0": {

@@ -1,0 +1,13 @@
+Job launching after 0.15 seconds in submission.
+Running python job.
+Changed into dir /Users/moonkey/Dropbox/Course/Optimization/Project/embo/bo_spearmint
+Importing bo.py
+Running bo.main()
+Got result -0.473253541309
+Completed successfully in 0.02 seconds. [{u'main': -0.47325354130893338}]
+{u't_mat_p_0': array([ 4.27713845]), u't_mat_p_1': array([ 12.74361439]), u'z_mat_p_0': array([ 7.3934287]), u'z_mat_p_1': array([ 3.39248745])}
+(1, 2)
+2
+[[ 7.3934287   3.39248745]]
+(1, 2)
+2
