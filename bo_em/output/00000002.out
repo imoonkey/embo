@@ -1,0 +1,13 @@
+Job launching after 0.16 seconds in submission.
+Running python job.
+Changed into dir /Users/moonkey/Dropbox/Course/Optimization/Project/embo/bo_em
+Importing bo_em.py
+Running bo_em.main()
+!!!!!!!!!!!!!!!!!!HMM INDEX:  3   !!!!!!!!!!!!!!!
+Got result 69.314718056
+Completed successfully in 0.30 seconds. [{u'main': 69.314718055994589}]
+(1, 2)
+2
+[[-0.48954823 -0.48954823]]
+[[-0.48954823 -0.48954823]]
+New history dumped.

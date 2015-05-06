@@ -11,6 +11,7 @@ import time
 import numpy as np
 import base64
 
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         """
@@ -50,7 +51,7 @@ def load_new_history(work_dir):
             historical_points = json.load(param_file, object_hook=json_numpy_obj_hook)
         return historical_points['history']
     except Exception:
-        return {}
+        return []
 
 
 def dump_new_history(work_dir, historical_points):
@@ -73,48 +74,63 @@ def dump_new_history(work_dir, historical_points):
 # }
 # ]}
 
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
+# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.insert(0, parentdir)
 
-import hmm
+from hmm import random_hmm, HMM, make_parameterized_HMM, retrieve_parameterized_HMM
 import numpy as np
 import em
 
 # Write a function like this called 'main'
 def main(job_id, params):
-    # print 'Anything printed here will end up in the output directory for job #%d' % job_id
-    print 'Params:' + str(params)
+    num_runs = 10
+    obs_length = 100
+    num_states = 2
+    num_obs = 2
+
+    # readin hmm indx
+    t = 0
+    try:
+        with open(os.path.join('.', 'hmm_index.txt')) as hmm_index_file:
+            t = int(hmm_index_file.read())
+        sys.stderr.write("!!!!!!!!!!!!!!!!!!HMM INDEX:  " + str(t) + "   !!!!!!!!!!!!!!!\n")
+    except IOError:
+        t = 0
+
 
     # generate HMM observations
-    z_mat_p = np.array([[np.log(9), np.log(1.0 / 9)]])
-    t_mat_p = np.array([[np.log(9), np.log(1.0 / 9)]])
-    pi_vec = np.array([0.5, 0.5])
-    hmm_groundtruth = hmm.make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec)
     np.random.seed(0x6b6c26b2)
-    obs = hmm_groundtruth.generate(100)
+    seeds = np.random.randint(0x0fffffff, size=num_runs)
+    np.random.seed(seeds[t])
+    # random hmm
+    z_mat, t_mat = random_hmm(num_states, num_obs)
+    pi_vec = np.array([1.0 / num_states] * num_states)
+    hmm_test = HMM(z_mat, t_mat, pi_vec)
+    # random obs trajectory
+    obs = hmm_test.generate(obs_length)[np.newaxis, :]
 
     # calculate log likelihood for input HMM parameters
     z_mat_p_input = np.array([[params['z_mat_p_0'][0], params['z_mat_p_1'][0]]])
     t_mat_p_input = np.array([[params['t_mat_p_0'][0], params['t_mat_p_1'][0]]])
     # pi_vec_input = np.array([params['pi_0'], 1 - params['pi_0']])
-    hmm_estimate = hmm.make_parameterized_HMM(z_mat_p_input, t_mat_p_input, pi_vec)
-    hmm_loglikelihood = hmm_estimate.loglikelihood(obs)
-    
+    hmm_estimate = make_parameterized_HMM(z_mat_p_input, t_mat_p_input, pi_vec)
+    hmm_loglikelihood = hmm_estimate.loglikelihood(obs[0])
+
     # use the current suggest point and run EM to get a new point
-    hmm_em_est, actual_iters = em.em(hmm_estimate, hmm_estimate.z_mat, hmm_estimate.t_mat, obs[np.newaxis,:], 30, 0.1)
-    em_est_z_mat, em_est_t_mat = hmm.retrieve_parameterized_HMM(hmm_em_est)
-    em_est_ll = -hmm_em_est.loglikelihood(obs)
+    hmm_em_est, _, _ = em.em(hmm_estimate, hmm_estimate.z_mat, hmm_estimate.t_mat, obs, 30, 0.1)
+    em_est_z_mat, em_est_t_mat = retrieve_parameterized_HMM(hmm_em_est)
+    em_est_ll = -hmm_em_est.loglikelihood(obs[0])
     em_est_z_mat.reshape((em_est_z_mat.size,))
     em_est_t_mat.reshape((em_est_t_mat.size,))
     print em_est_t_mat
     print em_est_z_mat
-    historical_points = [{'params' : {}}]
+    historical_points = [{'params': {}}]
     # write z_mat
-    for i,v in enumerate(em_est_z_mat[0]):
+    for i, v in enumerate(em_est_z_mat[0]):
         historical_points[0]['params']['z_mat_p_' + str(i)] = {'values': np.array([v]), 'type': 'float'}
     # write t_mat
-    for i,v in enumerate(em_est_t_mat[0]):
+    for i, v in enumerate(em_est_t_mat[0]):
         historical_points[0]['params']['t_mat_p_' + str(i)] = {'values': np.array([v]), 'type': 'float'}
     historical_points[0]['value'] = em_est_ll
     dump_new_history('.', historical_points)
@@ -124,8 +140,8 @@ def main(job_id, params):
 if __name__ == '__main__':
     parameters = {
         'z_mat_p_0': [9],
-        'z_mat_p_1': [1.0/9],
+        'z_mat_p_1': [1.0 / 9],
         't_mat_p_0': [9],
-        't_mat_p_1': [1.0/9],
+        't_mat_p_1': [1.0 / 9],
     }
-    print main(1,parameters)
+    print main(1, parameters)
