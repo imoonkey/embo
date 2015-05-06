@@ -139,6 +139,7 @@ def run_test():
     
     for t in range(num_runs):
         np.random.seed(seeds[t])
+        print(seeds[t])
         # random hmm
         z_mat, t_mat = random_hmm(num_states, num_obs)
         pi_vec = np.array([1.0 / num_states] * num_states)
@@ -159,11 +160,11 @@ def run_test():
     
     # compute some stuff
     ll_ratios = em_ll_maxes - actual_ll[:, np.newaxis]
-    print(actual_ll)
-    print(em_ll_maxes)
-    print(ll_ratios)
+#    print(actual_ll)
+#    print(em_ll_maxes)
+#    print(ll_ratios)
     mean_ll_ratios = np.mean(ll_ratios, axis=0)
-    print(mean_ll_ratios)
+#    print(mean_ll_ratios)
     plt.plot(mean_ll_ratios)
 
 if __name__ == '__main__':
