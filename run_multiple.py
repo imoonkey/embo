@@ -9,21 +9,21 @@ import json
 ####################################
 
 exp_config_boem = {
-    'hmm_num': 2,
+    'hmm_num': 10,
     'base_experiment_name': "bo-em-hmm",
     'exp_folder': "bo_em",
 }
 exp_config_simple_bo = {
-    'hmm_num': 2,
+    'hmm_num': 10,
     'base_experiment_name': "simple-bo-hmm",
     'exp_folder': "bo_spearmint",
 }
 
 
-def run_exp(exp_config):
+def run_exp(exp_config, start=0):
     mongo = Connection()
 
-    for hmm_idx in range(0, exp_config['hmm_num']):
+    for hmm_idx in range(start, exp_config['hmm_num']):
         experiment_name = exp_config['base_experiment_name'] + "-" + str(hmm_idx)
 
         # clean the database, uncomment this if the program was broken accidentally somewhere
@@ -47,9 +47,9 @@ def run_exp(exp_config):
 
         # start the experiment for this HMM
 
-        subprocess.call('./run_' + exp_config['base_experiment_name']+ '.sh', shell=True)
+        subprocess.call('./run_' + exp_config['base_experiment_name'] + '.sh', shell=True)
 
 
 if __name__ == "__main__":
-    # run_exp(exp_config_simple_bo)
-    run_exp(exp_config_boem)
+    # run_exp(exp_config_boem, start=9)
+    run_exp(exp_config_simple_bo)
