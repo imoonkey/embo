@@ -129,7 +129,7 @@ def run_test():
     num_runs = 10
     num_em_restarts = 50
     em_thres = 0.1
-    em_iters = 20
+    em_iters = 30
     obs_length = 100
     num_states = 2
     num_obs = 2
@@ -170,6 +170,9 @@ def run_test():
     mean_ll_ratios = np.mean(ll_ratios, axis=0)
 #    print(mean_ll_ratios)
     plt.plot(mean_ll_ratios)
+    
+    np.save('../actual_ll', actual_ll)
+    np.save('../em_ll', em_ll_maxes)
 
 
 if __name__ == '__main__':
