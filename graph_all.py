@@ -42,12 +42,19 @@ def graph_all():
     bo_em_ll_ratio_means = bo_em_ll_ratios.mean(axis=0)
     bo_ll_ratio_means = bo_ll_ratios.mean(axis=0)
     
-    plt.figure()
-    plt.plot(em_ll_ratio_means, label='EM')
-    plt.plot(bo_ll_ratio_means, label='BO')
-    plt.plot(bo_em_ll_ratio_means, label='EM+BO')
-    plt.ylim(ymin=-1,ymax=1.5)
+    plt.figure(dpi=300, figsize=(10,10))
+    plt.style.use('ggplot')
+    plt.plot(em_ll_ratio_means, label='EM', lw=5)
+    plt.plot(bo_ll_ratio_means, label='BO', lw=5)
+    plt.plot(bo_em_ll_ratio_means, label='EM+BO', lw=5)
+    plt.ylim(ymin=-1, ymax=1.5)
     plt.legend(loc='lower right')
+    plt.xlabel("Number of points/restarts")
+    plt.ylabel("log likelihood ratio")
+    plt.title("Comparison of MLE Approximation")
+    # plt.show()
+    plt.savefig('mle_plot.pdf')
+
     
 if __name__ == '__main__':
     graph_all()
