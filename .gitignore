@@ -2,6 +2,7 @@
 
 # do not include updates
 bo_spearmint/output/
+bo_em/output/
 run_test.sh
 
 *.iml

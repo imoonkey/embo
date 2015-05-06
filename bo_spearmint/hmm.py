@@ -97,8 +97,8 @@ def random_hmm(num_states, num_obs):
 
 def make_parameterized_HMM(z_mat_p, t_mat_p, pi_vec):
     num_states = t_mat_p.shape[1]
-    # print z_mat_p.shape
-    # print num_states
+    print z_mat_p.shape
+    print num_states
     z_mat = np.exp(np.vstack((z_mat_p, np.zeros((num_states,)))))
     t_mat = np.exp(np.vstack((t_mat_p, np.zeros((num_states,)))))
     
@@ -141,7 +141,7 @@ def test():
     print(hmm4.t_mat)
     
     np.random.seed(0x6b6c26b2)
-    obs1 = hmm1.generate(00)
+    obs1 = hmm1.generate(2)
     print(obs1)
 #    np.random.seed(0x6b6c26b2)
 #    obs2 = hmm2.generate(1000)
