@@ -34,6 +34,7 @@ def graph_all():
     bo_em_ll = cum_max(bo_em_ll)
     bo_ll = cum_max(bo_ll)
     
+    # graph the ll ratios
     em_ll_ratios = em_ll - actual_ll[:, np.newaxis]
     bo_em_ll_ratios = bo_em_ll - actual_ll[:, np.newaxis]
     bo_ll_ratios = bo_ll - actual_ll[:, np.newaxis]
@@ -42,7 +43,7 @@ def graph_all():
     bo_em_ll_ratio_means = bo_em_ll_ratios.mean(axis=0)
     bo_ll_ratio_means = bo_ll_ratios.mean(axis=0)
     
-    plt.figure(dpi=300, figsize=(10,10))
+    plt.figure(dpi=300, figsize=(5,3))
     plt.style.use('ggplot')
     plt.plot(em_ll_ratio_means, label='EM', lw=5)
     plt.plot(bo_ll_ratio_means, label='BO', lw=5)
@@ -53,7 +54,29 @@ def graph_all():
     plt.ylabel("log likelihood ratio")
     plt.title("Comparison of MLE Approximation")
     # plt.show()
-    plt.savefig('mle_plot.pdf')
+#    plt.savefig('mle_plot.pdf')
+    
+    # graph which one had the best
+    em_better = np.logical_and((em_ll >= bo_em_ll),(em_ll >= bo_ll))
+    bo_em_better = np.logical_and((bo_em_ll >= em_ll),(bo_em_ll >= bo_ll))
+    bo_better = np.logical_and((bo_ll >= bo_em_ll),(bo_ll >= em_ll))
+    
+    em_better_means = em_better.mean(axis=0)
+    bo_em_better_means = bo_em_better.mean(axis=0)
+    bo_better_means = bo_better.mean(axis=0)
+    
+    plt.figure(dpi=300, figsize=(5,3))
+    plt.style.use('ggplot')
+    plt.plot(em_better_means, label='EM', lw=5)
+    plt.plot(bo_better_means, label='BO', lw=5)
+    plt.plot(bo_em_better_means, label='EM+BO', lw=5)
+    plt.ylim(ymin=0, ymax=1.0)
+    plt.legend(loc='middle right')
+    plt.xlabel("Number of points/restarts")
+    plt.ylabel("Porbability of Being the Best")
+    plt.title("Comparison of MLE Optimization")
+    # plt.show()
+    plt.savefig('best_plot.pdf')
 
     
 if __name__ == '__main__':
