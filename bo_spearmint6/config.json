@@ -1,0 +1,1 @@
+{"likelihood": "NOISELESS", "variables": {"t_mat_p_0": {"max": 1, "min": -1, "type": "FLOAT", "size": 1}, "t_mat_p_1": {"max": 1, "min": -1, "type": "FLOAT", "size": 1}, "z_mat_p_0": {"max": 1, "min": -1, "type": "FLOAT", "size": 1}, "z_mat_p_1": {"max": 1, "min": -1, "type": "FLOAT", "size": 1}}, "main-file": "bo.py", "experiment-name": "simple-bo-6x-hmm", "language": "PYTHON"}

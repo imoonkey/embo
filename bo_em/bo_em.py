@@ -84,7 +84,7 @@ import em
 
 # Write a function like this called 'main'
 def main(job_id, params):
-    num_runs = 10
+    num_runs = 20
     obs_length = 100
     num_states = 2
     num_obs = 2

@@ -9,12 +9,12 @@ import json
 ####################################
 
 exp_config_boem = {
-    'hmm_num': 10,
+    'hmm_num': 20,
     'base_experiment_name': "bo-em-hmm",
     'exp_folder': "bo_em",
 }
 exp_config_simple_bo = {
-    'hmm_num': 10,
+    'hmm_num': 20,
     'base_experiment_name': "simple-bo-hmm",
     'exp_folder': "bo_spearmint",
 }
@@ -27,8 +27,8 @@ def run_exp(exp_config, start=0):
         experiment_name = exp_config['base_experiment_name'] + "-" + str(hmm_idx)
 
         # clean the database, uncomment this if the program was broken accidentally somewhere
-        mongo['spearmint'].drop_collection(experiment_name + '.jobs')
-        mongo['spearmint'].drop_collection(experiment_name + '.hypers')
+        # mongo['spearmint'].drop_collection(experiment_name + '.jobs')
+        # mongo['spearmint'].drop_collection(experiment_name + '.hypers')
 
         spearmint_config = open(os.path.join(os.path.abspath(exp_config['exp_folder']), 'config.json'))
         spearmint_config_json = json.load(spearmint_config)
@@ -51,5 +51,5 @@ def run_exp(exp_config, start=0):
 
 
 if __name__ == "__main__":
-    # run_exp(exp_config_boem, start=9)
-    run_exp(exp_config_simple_bo)
+    run_exp(exp_config_boem, start=10)
+    run_exp(exp_config_simple_bo, start=10)

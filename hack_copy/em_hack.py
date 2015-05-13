@@ -1,6 +1,7 @@
 __author__ = 'moonkey'
 
 import os
+import sys
 
 try:
     import simplejson as json
@@ -48,11 +49,12 @@ def json_numpy_obj_hook(dct):
 def load_new_history(work_dir):
     file_path = os.path.join(work_dir, "extra_history.json")
     try:
+        historical_points = {'history': []}
         with open(file_path) as param_file:
             historical_points = json.load(param_file, object_hook=json_numpy_obj_hook)
         return historical_points['history']
     except Exception:
-        return {}
+        return []
 
 
 def dump_new_history(work_dir, historical_points):
@@ -77,7 +79,7 @@ def dump_new_history(work_dir, historical_points):
 
 
 def add_historical_points_to_db(db, experiment_name, expt_dir=""):
-    jobs = _load_jobs(db, experiment_name)
+    jobs = hack_load_jobs(db, experiment_name)
     historical_points = load_new_history(expt_dir)
 
     for idx in range(0, len(historical_points)):
@@ -96,10 +98,13 @@ def add_historical_points_to_db(db, experiment_name, expt_dir=""):
             'end time': time.time(),
             "values": {"main": historical_points[idx]['value']},
         }
-        _save_job(job, db, experiment_name)
+        hack_save_job(job, db, experiment_name)
+        sys.stderr.write(str(job['params']) + "\n")
+        sys.stderr.write('value' + str(job['values']) + "\n")
+    sys.stderr.write("Writed extra history into the database\n")
 
 
-def _load_jobs(db, experiment_name):
+def hack_load_jobs(db, experiment_name):
     """load the jobs from the database
 
     Returns
@@ -117,42 +122,43 @@ def _load_jobs(db, experiment_name):
     return jobs
 
 
-def _save_job(job, db, experiment_name):
+def hack_save_job(job, db, experiment_name):
     """save a job to the database"""
     db.save(job, experiment_name, 'jobs', {'id': job['id']})
 
 
+# def hack_check_hmm_index(work_dir):
+# file_path = os.path.join(work_dir, "hmm_index.txt")
+#     try:
+#         hmm_index = int(open(file_path).read())
+#     except IOError:
+#         return None
+
+
+#tested
 def _test_json():
     j = [
         {
             'params': {
-                't_mat_p_0': {'values': np.array([-50.]), 'type': 'float'},
-                't_mat_p_1': {'values': np.array([-50.]), 'type': 'float'},
-                'z_mat_p_0': {'values': np.array([-50.]), 'type': 'float'},
-                'z_mat_p_1': {'values': np.array([-50.]), 'type': 'float'}
+                't_mat_p_0': {'values': np.array([49.97906585]), 'type': 'float'},
+                't_mat_p_1': {'values': np.array([-50.0000000]), 'type': 'float'},
+                'z_mat_p_0': {'values': np.array([18.85639504]), 'type': 'float'},
+                'z_mat_p_1': {'values': np.array([49.98914831]), 'type': 'float'}
             },
-            'value': 1786.8302035693616
-        },
-        {
-            'params': {
-                't_mat_p_0': {'values': np.array([0.]), 'type': 'float'},
-                't_mat_p_1': {'values': np.array([0.]), 'type': 'float'},
-                'z_mat_p_0': {'values': np.array([0.]), 'type': 'float'},
-                'z_mat_p_1': {'values': np.array([0.]), 'type': 'float'}
-            },
-            'value': 13.862943611198906
+            'value': 56.569185259280097
         }
     ]
-    dump_new_history('', j)
-    k = load_new_history('')
+    dump_new_history('../../embo/bo_em/', j)
+    k = load_new_history('../../embo/bo_em/')
     print j == k
 
 
+#tested
 def _test_db():
     db = MongoDB(database_address='localhost')
     add_historical_points_to_db(db, 'simple-bo-hmm', '')
 
 
 if __name__ == "__main__":
-    # _test_json()
-    _test_db()
+    _test_json()
+    # _test_db()

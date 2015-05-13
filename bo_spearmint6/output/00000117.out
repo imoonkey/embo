@@ -1,0 +1,9 @@
+Job launching after 0.15 seconds in submission.
+Running python job.
+Changed into dir /Users/moonkey/Dropbox/Course/Optimization/Project/embo/bo_spearmint6
+Importing bo.py
+Running bo.main()
+Got result 68.5879639885
+Completed successfully in 0.02 seconds. [{u'main': 68.587963988467109}]
+(1, 2)
+2

@@ -250,8 +250,9 @@ def get_options():
 
     return options, expt_dir
 
-# TODO:: first find the spot to add the jobs into the db.
-# TODO:: second find what to do with the hypers.
+
+# DONE:: (moonkey) first find the spot to add the jobs into the db.
+# TODO:: (moonkey) second find what to do with the hypers.
 
 def main():
     options, expt_dir = get_options()
@@ -268,11 +269,12 @@ def main():
     sys.stderr.write('Using database at %s.\n' % db_address)
     db = MongoDB(database_address=db_address)
 
-    while True:
-
+    # np.random.seed(0x6b6c26b2)
+    hack_iter = 0
+    while hack_iter < 50:
         for resource_name, resource in resources.iteritems():
 
-            #TODO:: (moonkey) might be in vain, as the jobs will be loaded later in the inner loop
+            # TODO:: (moonkey) might be in vain, as the jobs will be loaded later in the inner loop
             jobs = load_jobs(db, experiment_name)
             # resource.printStatus(jobs)
 
@@ -291,7 +293,14 @@ def main():
                 # to treat them as if they are sampled by BO, and utilize them to compute the GP and the
                 # acquisition functions.
                 # We are assuming the data are written in json format at the folder of 'config.json' file.
-                em_hack.add_historical_points_to_db(db, experiment_name)
+                hack_iter += 1
+                sys.stderr.write('###########hack_iter:' + str(hack_iter) + "###########\n")
+                em_hack.add_historical_points_to_db(db, experiment_name, expt_dir)
+                # # (moonkey) towards removing the randomness
+                # np.random.seed(0x6b6c26b2)
+                # if hack_iter == 3:
+                #     em_hack.add_historical_points_to_db(db, experiment_name, expt_dir)
+                    # continue
                 ################ HACK END ################
 
                 # Load jobs from DB 
@@ -374,6 +383,9 @@ def get_suggestion(chooser, task_names, db, expt_dir, options, resource_name):
     # Load the model hypers from the database.
     hypers = load_hypers(db, experiment_name)
 
+    # # (moonkey) towards removing the randomness
+    # hypers = None
+
     # "Fit" the chooser - give the chooser data and let it fit the model.
     hypers = chooser.fit(task_group, hypers, task_options)
 
@@ -447,7 +459,6 @@ def load_jobs(db, experiment_name):
         jobs = []
     if isinstance(jobs, dict):
         jobs = [jobs]
-
     return jobs
 
 
